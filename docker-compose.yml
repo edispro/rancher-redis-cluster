@@ -4,7 +4,6 @@ services:
     image: ahfeel/rancher-redis-cluster-sentinel
     environment:
       SENTINEL_DOWN_AFTER_MILLISECONDS: '5000'
-      REDIS_PASSWORD:${REDIS_PASSWORD}
     stdin_open: true
     tty: true
     labels:
@@ -19,12 +18,15 @@ services:
       net.core.somaxconn: "511"
   redis-server:
     image: ahfeel/rancher-redis-cluster-node
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
     stdin_open: true
     volumes:
     - /data/redis:/data
     tty: true
     labels:
       io.rancher.scheduler.affinity:container_label_ne: redis-server=1
+      io.rancher.scheduler.affinity:host_label: db=1
       io.rancher.container.start_once: 'true'
       io.rancher.container.hostname_override: container_name
       redis-server: '1'
